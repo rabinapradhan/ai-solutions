@@ -38,7 +38,7 @@ ${query}
       contents: prompt,
     });
 
-    res.json({ answer: response.text, link: `/${bestSection}` });
+    res.json({ answer: response.text });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server Error" });
