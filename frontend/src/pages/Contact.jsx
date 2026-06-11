@@ -7,6 +7,7 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const Contact = () => {
   const [formData, setFormData] = useState({
     full_name: "",
@@ -38,7 +39,7 @@ const Contact = () => {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/inquiries", formData);
+      await axios.post(`${API}/api/inquiries`, formData);
       setStatus("success");
     } catch (err) {
       setStatus("error");
