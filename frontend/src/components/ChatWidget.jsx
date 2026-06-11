@@ -183,33 +183,6 @@ export default function ChatWidget() {
                     <div style={styles.botAvatarSmall}>{BOT_AVATAR}</div>
                     <div>
                       <div style={styles.botBubble}>{msg.text}</div>
-                      {msg.link && (
-                        <a
-                          href={msg.link}
-                          style={styles.linkChip}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                            style={{ marginRight: 5, flexShrink: 0 }}
-                          >
-                            <path
-                              d="M2 6H10M7 3L10 6L7 9"
-                              stroke="#00e5cc"
-                              strokeWidth="1.4"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                          {msg.link.replace("/", "").charAt(0).toUpperCase() +
-                            msg.link.replace("/", "").slice(1)}{" "}
-                          page
-                        </a>
-                      )}
                     </div>
                   </div>
                 ),
