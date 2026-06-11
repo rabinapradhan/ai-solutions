@@ -178,6 +178,7 @@ export default function InquiryTable({ embedded = false }) {
       const res = await axios.get(`${API}/api/inquiries`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log(res.data);
       setInquiries(res.data);
       setFiltered(res.data);
     } catch {
