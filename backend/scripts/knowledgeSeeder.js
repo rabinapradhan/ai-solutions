@@ -1,5 +1,4 @@
 const pool = require("../config/db");
-
 const { generateEmbedding } = require("../utils/embeddingService");
 
 const data = [
@@ -55,34 +54,26 @@ async function seed() {
     for (const item of data) {
       const embedding = await generateEmbedding(item.content);
 
+      // Convert JS array into Postgres vector format: {0.123,0.456,...}
+      const embeddingArray = `{${embedding.join(",")}}`;
+
       console.log("Section:", item.section);
       console.log("Embedding length:", embedding.length);
 
       await pool.query(
         `
         INSERT INTO knowledge_base
-        (
-          section,
-          content,
-          embedding
-        )
-        VALUES
-        (
-          $1,
-          $2,
-          $3
-        )
+        (section, content, embedding)
+        VALUES ($1, $2, $3)
         `,
-        [item.section, item.content, JSON.stringify(embedding)],
+        [item.section, item.content, embeddingArray],
       );
     }
 
     console.log("Knowledge Base Seeded");
-
     process.exit();
   } catch (err) {
     console.error(err);
-
     process.exit(1);
   }
 }
