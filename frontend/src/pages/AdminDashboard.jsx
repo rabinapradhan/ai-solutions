@@ -5,6 +5,7 @@ import DashboardCards from "../components/DashboardCards";
 import Charts from "../components/Charts";
 import InquiryTable from "../components/InquiryTable";
 import Analytics from "../components/Analytics";
+import ChangePassword from "../components/ChangePassword";
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -72,9 +73,18 @@ export default function AdminDashboard() {
           )}
 
           {activeSection === "settings" && (
-            <div className="flex items-center justify-center h-64">
-              <p className="text-slate-500 text-lg">Settings coming soon...</p>
-            </div>
+            <>
+              <div>
+                <h1 className="text-2xl font-bold text-white tracking-tight">
+                  Settings
+                </h1>
+                <p className="text-slate-400 text-sm mt-1">
+                  Manage administrator account settings.
+                </p>
+              </div>
+
+              <ChangePassword />
+            </>
           )}
         </main>
       </div>
