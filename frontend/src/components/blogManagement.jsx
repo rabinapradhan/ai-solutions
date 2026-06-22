@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 
-export default function BlogManagement() {
+const blogManagement = () => {
   const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   const [formData, setFormData] = useState({
     title: "",
@@ -18,13 +20,29 @@ export default function BlogManagement() {
 
   const fetchBlogs = async () => {
     try {
+      setLoading(true);
+
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/blogs`);
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch blogs");
+      }
 
       const data = await res.json();
 
-      setBlogs(data);
+      // Handle either array response or { blogs: [] }
+      if (Array.isArray(data)) {
+        setBlogs(data);
+      } else if (Array.isArray(data.blogs)) {
+        setBlogs(data.blogs);
+      } else {
+        setBlogs([]);
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Fetch blogs error:", error);
+      setMessage("Failed to load blog posts.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,6 +56,13 @@ export default function BlogManagement() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setMessage("");
+
+    if (!token) {
+      setMessage("You must be logged in.");
+      return;
+    }
+
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/blogs`, {
         method: "POST",
@@ -49,7 +74,9 @@ export default function BlogManagement() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to create blog");
+        const errorData = await res.json().catch(() => ({}));
+
+        throw new Error(errorData.message || "Failed to create blog post");
       }
 
       setFormData({
@@ -59,33 +86,58 @@ export default function BlogManagement() {
         category: "",
       });
 
+      setMessage("Blog post created successfully.");
+
       fetchBlogs();
     } catch (error) {
-      console.error(error);
+      console.error("Create blog error:", error);
+      setMessage(error.message);
     }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this blog post?")) return;
 
+    if (!token) {
+      setMessage("You must be logged in.");
+      return;
+    }
+
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/blogs/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/blogs/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to delete blog post");
+      }
+
+      setMessage("Blog post deleted successfully.");
 
       fetchBlogs();
     } catch (error) {
-      console.error(error);
+      console.error("Delete blog error:", error);
+      setMessage(error.message);
     }
   };
 
   return (
     <div className="space-y-6">
+      {/* Create Blog Form */}
       <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
         <h2 className="text-xl font-semibold mb-4">Create Blog Post</h2>
+
+        {message && (
+          <div className="mb-4 p-3 rounded-lg bg-slate-800 text-sm text-slate-300">
+            {message}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -99,7 +151,7 @@ export default function BlogManagement() {
           />
 
           <textarea
-            rows="5"
+            rows="6"
             name="content"
             placeholder="Blog Content"
             value={formData.content}
@@ -142,14 +194,17 @@ export default function BlogManagement() {
         </form>
       </div>
 
+      {/* Blog List */}
       <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
         <h2 className="text-xl font-semibold mb-4">Existing Blog Posts</h2>
 
-        <div className="space-y-4">
-          {blogs.length === 0 ? (
-            <p className="text-slate-400">No blog posts found.</p>
-          ) : (
-            blogs.map((blog) => (
+        {loading ? (
+          <p className="text-slate-400">Loading blogs...</p>
+        ) : blogs.length === 0 ? (
+          <p className="text-slate-400">No blog posts found.</p>
+        ) : (
+          <div className="space-y-4">
+            {blogs.map((blog) => (
               <div
                 key={blog.id}
                 className="flex items-center justify-between bg-slate-800 p-4 rounded-xl"
@@ -162,7 +217,9 @@ export default function BlogManagement() {
                   </p>
 
                   <p className="text-xs text-slate-500 mt-1">
-                    {new Date(blog.created_at).toLocaleDateString()}
+                    {blog.created_at
+                      ? new Date(blog.created_at).toLocaleDateString()
+                      : "No date"}
                   </p>
                 </div>
 
@@ -173,10 +230,12 @@ export default function BlogManagement() {
                   Delete
                 </button>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
-}
+};
+
+export default blogManagement;
