@@ -6,7 +6,7 @@ import Charts from "../components/Charts";
 import InquiryTable from "../components/InquiryTable";
 import Analytics from "../components/Analytics";
 import ChangePassword from "../components/ChangePassword";
-import BlogManagement from "../components/blogManagement";
+import BlogManagement from "../components/BlogManagement";
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");

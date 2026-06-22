@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
+  BookOpen,
 } from "lucide-react";
 
 const navItems = [
@@ -16,6 +17,7 @@ const navItems = [
   {
     id: "blogs",
     label: "Blog Management",
+    icon: BookOpen,
   },
 ];
 
