@@ -13,6 +13,10 @@ const navItems = [
   { id: "inquiries", label: "Inquiries", icon: FileText },
   { id: "analytics", label: "Analytics", icon: BarChart2 },
   { id: "settings", label: "Settings", icon: Settings },
+  {
+    id: "blogs",
+    label: "Blog Management",
+  },
 ];
 
 export default function Sidebar({ active, setActive, open, setOpen }) {

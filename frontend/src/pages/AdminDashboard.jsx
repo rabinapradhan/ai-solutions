@@ -6,6 +6,7 @@ import Charts from "../components/Charts";
 import InquiryTable from "../components/InquiryTable";
 import Analytics from "../components/Analytics";
 import ChangePassword from "../components/ChangePassword";
+import BlogManagement from "../components/BlogManagement";
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -84,6 +85,21 @@ export default function AdminDashboard() {
               </div>
 
               <ChangePassword />
+            </>
+          )}
+          {activeSection === "blogs" && (
+            <>
+              <div>
+                <h1 className="text-2xl font-bold text-white tracking-tight">
+                  Blog Management
+                </h1>
+
+                <p className="text-slate-400 text-sm mt-1">
+                  Create and manage blog articles.
+                </p>
+              </div>
+
+              <BlogManagement />
             </>
           )}
         </main>
