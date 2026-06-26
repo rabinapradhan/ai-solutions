@@ -6,6 +6,7 @@ const inquiryRoutes = require("./routes/inquiryRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes");
 const blogRoutes = require("./routes/blogRoutes");
+const eventRoutes = require("./routes/eventRoutes");
 
 const app = express();
 app.use(
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 app.use("/api/inquiries", inquiryRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/blogs", blogRoutes);
+app.use("/api/events", eventRoutes);
 app.use("/api", chatbotRoutes);
 
 const PORT = process.env.PORT || 5000;
