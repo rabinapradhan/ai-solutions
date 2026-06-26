@@ -1,46 +1,47 @@
 import { useEffect, useState } from "react";
 
-const EventManagement = () => {
-  const [events, setEvents] = useState([]);
+const PortfolioManagement = () => {
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
+    category: "",
     description: "",
-    location: "",
-    event_date: "",
+    image_url: "",
+    metric: "",
   });
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    fetchEvents();
+    fetchPortfolio();
   }, []);
 
-  const fetchEvents = async () => {
+  const fetchPortfolio = async () => {
     try {
       setLoading(true);
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/events`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/portfolio`);
 
       if (!res.ok) {
-        throw new Error("Failed to fetch events");
+        throw new Error("Failed to fetch portfolio");
       }
 
       const data = await res.json();
 
       if (Array.isArray(data)) {
-        setEvents(data);
-      } else if (Array.isArray(data.events)) {
-        setEvents(data.events);
+        setProjects(data);
+      } else if (Array.isArray(data.portfolio)) {
+        setProjects(data.portfolio);
       } else {
-        setEvents([]);
+        setProjects([]);
       }
     } catch (error) {
       console.error(error);
-      setMessage("Failed to load events.");
+      setMessage("Failed to load portfolio.");
     } finally {
       setLoading(false);
     }
@@ -53,14 +54,15 @@ const EventManagement = () => {
     }));
   };
 
-  const handleEdit = (event) => {
-    setEditingId(event.id);
+  const handleEdit = (project) => {
+    setEditingId(project.id);
 
     setFormData({
-      title: event.title,
-      description: event.description,
-      location: event.location,
-      event_date: event.event_date ? event.event_date.split("T")[0] : "",
+      title: project.title,
+      category: project.category,
+      description: project.description,
+      image_url: project.image_url,
+      metric: project.metric,
     });
 
     window.scrollTo({
@@ -74,9 +76,10 @@ const EventManagement = () => {
 
     setFormData({
       title: "",
+      category: "",
       description: "",
-      location: "",
-      event_date: "",
+      image_url: "",
+      metric: "",
     });
   };
 
@@ -92,8 +95,8 @@ const EventManagement = () => {
 
     try {
       const url = editingId
-        ? `${import.meta.env.VITE_API_URL}/api/events/${editingId}`
-        : `${import.meta.env.VITE_API_URL}/api/events`;
+        ? `${import.meta.env.VITE_API_URL}/api/portfolio/${editingId}`
+        : `${import.meta.env.VITE_API_URL}/api/portfolio`;
 
       const method = editingId ? "PUT" : "POST";
 
@@ -108,19 +111,19 @@ const EventManagement = () => {
 
       if (!res.ok) {
         throw new Error(
-          editingId ? "Failed to update event" : "Failed to create event",
+          editingId ? "Failed to update project" : "Failed to create project",
         );
       }
 
       setMessage(
         editingId
-          ? "Event updated successfully."
-          : "Event created successfully.",
+          ? "Project updated successfully."
+          : "Project created successfully.",
       );
 
       resetForm();
 
-      fetchEvents();
+      fetchPortfolio();
     } catch (error) {
       console.error(error);
       setMessage(error.message);
@@ -128,7 +131,7 @@ const EventManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this event?")) return;
+    if (!window.confirm("Delete this project?")) return;
 
     if (!token) {
       setMessage("You must be logged in.");
@@ -137,7 +140,7 @@ const EventManagement = () => {
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/events/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/portfolio/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -147,12 +150,12 @@ const EventManagement = () => {
       );
 
       if (!res.ok) {
-        throw new Error("Failed to delete event");
+        throw new Error("Failed to delete project");
       }
 
-      setMessage("Event deleted successfully.");
+      setMessage("Project deleted successfully.");
 
-      fetchEvents();
+      fetchPortfolio();
     } catch (error) {
       console.error(error);
       setMessage(error.message);
@@ -161,10 +164,11 @@ const EventManagement = () => {
 
   return (
     <div className="space-y-6">
-      {/* Create / Update Event */}
-      <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
-        <h2 className="text-xl font-semibold mb-4">
-          {editingId ? "Update Event" : "Create Event"}
+      {/* Create / Update Project */}
+
+      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+        <h2 className="mb-4 text-xl font-semibold">
+          {editingId ? "Update Portfolio Project" : "Create Portfolio Project"}
         </h2>
 
         {message && (
@@ -177,8 +181,18 @@ const EventManagement = () => {
           <input
             type="text"
             name="title"
-            placeholder="Event Title"
+            placeholder="Project Title"
             value={formData.title}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 outline-none"
+          />
+
+          <input
+            type="text"
+            name="category"
+            placeholder="Category (Healthcare, Logistics...)"
+            value={formData.category}
             onChange={handleChange}
             required
             className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 outline-none"
@@ -187,7 +201,7 @@ const EventManagement = () => {
           <textarea
             rows="5"
             name="description"
-            placeholder="Event Description"
+            placeholder="Project Description"
             value={formData.description}
             onChange={handleChange}
             required
@@ -196,36 +210,45 @@ const EventManagement = () => {
 
           <input
             type="text"
-            name="location"
-            placeholder="Location"
-            value={formData.location}
+            name="image_url"
+            placeholder="Image URL"
+            value={formData.image_url}
             onChange={handleChange}
             required
             className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 outline-none"
           />
 
           <input
-            type="date"
-            name="event_date"
-            value={formData.event_date}
+            type="text"
+            name="metric"
+            placeholder="Metric (34% downtime reduction)"
+            value={formData.metric}
             onChange={handleChange}
             required
             className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 outline-none"
           />
+
+          {formData.image_url && (
+            <img
+              src={formData.image_url}
+              alt="Preview"
+              className="h-48 w-full rounded-lg object-cover"
+            />
+          )}
 
           <div className="flex gap-3">
             <button
               type="submit"
               className="rounded-lg bg-blue-600 px-5 py-3 font-medium hover:bg-blue-700"
             >
-              {editingId ? "Update Event" : "Create Event"}
+              {editingId ? "Update Project" : "Create Project"}
             </button>
 
             {editingId && (
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-lg bg-gray-600 px-5 py-3 font-medium hover:bg-gray-700"
+                className="rounded-lg bg-gray-600 px-5 py-3 hover:bg-gray-700"
               >
                 Cancel
               </button>
@@ -234,48 +257,56 @@ const EventManagement = () => {
         </form>
       </div>
 
-      {/* Event List */}
+      {/* Existing Projects */}
 
-      <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
-        <h2 className="mb-4 text-xl font-semibold">Existing Events</h2>
+      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+        <h2 className="mb-4 text-xl font-semibold">
+          Existing Portfolio Projects
+        </h2>
 
         {loading ? (
-          <p className="text-slate-400">Loading events...</p>
-        ) : events.length === 0 ? (
-          <p className="text-slate-400">No events found.</p>
+          <p className="text-slate-400">Loading projects...</p>
+        ) : projects.length === 0 ? (
+          <p className="text-slate-400">No portfolio projects found.</p>
         ) : (
-          <div className="space-y-4">
-            {events.map((event) => (
+          <div className="space-y-5">
+            {projects.map((project) => (
               <div
-                key={event.id}
+                key={project.id}
                 className="flex items-center justify-between rounded-xl bg-slate-800 p-4"
               >
-                <div>
-                  <h3 className="text-lg font-semibold">{event.title}</h3>
+                <div className="flex items-center gap-4">
+                  <img
+                    src={project.image_url}
+                    alt={project.title}
+                    className="h-24 w-36 rounded-lg object-cover"
+                  />
 
-                  <p className="mt-1 text-sm text-slate-400">
-                    {event.description}
-                  </p>
+                  <div>
+                    <h3 className="text-lg font-semibold">{project.title}</h3>
 
-                  <p className="mt-2 text-sm text-slate-300">
-                    📍 {event.location}
-                  </p>
+                    <p className="text-sm text-teal-400">{project.category}</p>
 
-                  <p className="text-xs text-slate-500">
-                    📅 {new Date(event.event_date).toLocaleDateString()}
-                  </p>
+                    <p className="mt-2 max-w-xl text-sm text-slate-400">
+                      {project.description}
+                    </p>
+
+                    <p className="mt-2 text-xs font-semibold text-primary">
+                      {project.metric}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleEdit(event)}
-                    className="bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-200 px-4 py-2 rounded-lg transition"
+                    onClick={() => handleEdit(project)}
+                    className="rbg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-200 px-4 py-2 rounded-lg transition"
                   >
                     Edit
                   </button>
 
                   <button
-                    onClick={() => handleDelete(event.id)}
+                    onClick={() => handleDelete(project.id)}
                     className="rounded-lg bg-red-600 px-4 py-2 hover:bg-red-700"
                   >
                     Delete
@@ -290,4 +321,4 @@ const EventManagement = () => {
   );
 };
 
-export default EventManagement;
+export default PortfolioManagement;

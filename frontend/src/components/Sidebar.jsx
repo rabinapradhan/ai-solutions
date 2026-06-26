@@ -7,17 +7,51 @@ import {
   ChevronRight,
   Zap,
   BookOpen,
+  CalendarDays,
+  Briefcase,
 } from "lucide-react";
 
 const navItems = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "inquiries", label: "Inquiries", icon: FileText },
-  { id: "analytics", label: "Analytics", icon: BarChart2 },
-  { id: "settings", label: "Settings", icon: Settings },
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+  },
+
+  {
+    id: "inquiries",
+    label: "Inquiries",
+    icon: FileText,
+  },
+
+  {
+    id: "analytics",
+    label: "Analytics",
+    icon: BarChart2,
+  },
+
   {
     id: "blogs",
     label: "Blog Management",
     icon: BookOpen,
+  },
+
+  {
+    id: "events",
+    label: "Event Management",
+    icon: CalendarDays,
+  },
+
+  {
+    id: "portfolio",
+    label: "Portfolio Management",
+    icon: Briefcase,
+  },
+
+  {
+    id: "settings",
+    label: "Settings",
+    icon: Settings,
   },
 ];
 

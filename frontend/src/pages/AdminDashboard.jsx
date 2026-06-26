@@ -7,6 +7,9 @@ import InquiryTable from "../components/InquiryTable";
 import Analytics from "../components/Analytics";
 import ChangePassword from "../components/ChangePassword";
 import BlogManagement from "../components/blogManagement";
+import EventManagement from "../components/EventManagement";
+import PortfolioManagement from "../components/PortfolioManagement";
+
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -72,20 +75,6 @@ export default function AdminDashboard() {
             </>
           )}
 
-          {activeSection === "settings" && (
-            <>
-              <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">
-                  Settings
-                </h1>
-                <p className="text-slate-400 text-sm mt-1">
-                  Manage administrator account settings.
-                </p>
-              </div>
-
-              <ChangePassword />
-            </>
-          )}
           {activeSection === "blogs" && (
             <>
               <div>
@@ -99,6 +88,52 @@ export default function AdminDashboard() {
               </div>
 
               <BlogManagement />
+            </>
+          )}
+
+          {activeSection === "events" && (
+            <>
+              <div>
+                <h1 className="text-2xl font-bold text-white tracking-tight">
+                  Event Management
+                </h1>
+
+                <p className="text-slate-400 text-sm mt-1">
+                  Create and manage company events.
+                </p>
+              </div>
+
+              <EventManagement />
+            </>
+          )}
+          {activeSection === "portfolio" && (
+            <>
+              <div>
+                <h1 className="text-2xl font-bold text-white tracking-tight">
+                  Portfolio Management
+                </h1>
+
+                <p className="mt-1 text-sm text-slate-400">
+                  Create and manage portfolio projects.
+                </p>
+              </div>
+
+              <PortfolioManagement />
+            </>
+          )}
+
+          {activeSection === "settings" && (
+            <>
+              <div>
+                <h1 className="text-2xl font-bold text-white tracking-tight">
+                  Settings
+                </h1>
+                <p className="text-slate-400 text-sm mt-1">
+                  Manage administrator account settings.
+                </p>
+              </div>
+
+              <ChangePassword />
             </>
           )}
         </main>
