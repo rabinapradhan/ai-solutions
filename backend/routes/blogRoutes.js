@@ -9,6 +9,7 @@ router.get("/", blogController.getBlogs);
 
 // ADMIN
 router.post("/", protect, blogController.createBlog);
+router.put("/:id", protect, blogController.updateBlog);
 router.delete("/:id", protect, blogController.deleteBlog);
 
 module.exports = router;

@@ -24,6 +24,18 @@ exports.createBlog = async (req, res) => {
   }
 };
 
+exports.updateBlog = async (req, res) => {
+  try {
+    const blog = await Blog.updateBlog(req.params.id, req.body);
+
+    res.json(blog);
+  } catch (err) {
+    res.status(500).json({
+      error: "Failed to update blog",
+    });
+  }
+};
+
 exports.deleteBlog = async (req, res) => {
   try {
     await Blog.deleteBlog(req.params.id);

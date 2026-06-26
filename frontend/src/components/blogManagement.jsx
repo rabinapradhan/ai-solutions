@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 const blogManagement = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [editingId, setEditingId] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -52,7 +53,21 @@ const blogManagement = () => {
       [e.target.name]: e.target.value,
     }));
   };
+  const handleEdit = (blog) => {
+    setEditingId(blog.id);
 
+    setFormData({
+      title: blog.title,
+      content: blog.content,
+      author: blog.author,
+      category: blog.category,
+    });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -64,8 +79,14 @@ const blogManagement = () => {
     }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/blogs`, {
-        method: "POST",
+      const url = editingId
+        ? `${import.meta.env.VITE_API_URL}/api/blogs/${editingId}`
+        : `${import.meta.env.VITE_API_URL}/api/blogs`;
+
+      const method = editingId ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -74,9 +95,9 @@ const blogManagement = () => {
       });
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-
-        throw new Error(errorData.message || "Failed to create blog post");
+        throw new Error(
+          editingId ? "Failed to update blog" : "Failed to create blog",
+        );
       }
 
       setFormData({
@@ -86,15 +107,18 @@ const blogManagement = () => {
         category: "",
       });
 
-      setMessage("Blog post created successfully.");
+      setEditingId(null);
+
+      setMessage(
+        editingId ? "Blog updated successfully." : "Blog created successfully.",
+      );
 
       fetchBlogs();
     } catch (error) {
-      console.error("Create blog error:", error);
+      console.error(error);
       setMessage(error.message);
     }
   };
-
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this blog post?")) return;
 
@@ -131,7 +155,9 @@ const blogManagement = () => {
     <div className="space-y-6">
       {/* Create Blog Form */}
       <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
-        <h2 className="text-xl font-semibold mb-4">Create Blog Post</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          {editingId ? "Update Blog Post" : "Create Blog Post"}
+        </h2>
 
         {message && (
           <div className="mb-4 p-3 rounded-lg bg-slate-800 text-sm text-slate-300">
@@ -189,8 +215,26 @@ const blogManagement = () => {
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 transition px-5 py-3 rounded-lg font-medium"
           >
-            Create Blog
+            {editingId ? "Update Blog" : "Create Blog"}
           </button>
+          {editingId && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingId(null);
+
+                setFormData({
+                  title: "",
+                  content: "",
+                  author: "",
+                  category: "",
+                });
+              }}
+              className="ml-3 bg-gray-600 hover:bg-gray-700 px-5 py-3 rounded-lg font-medium"
+            >
+              Cancel
+            </button>
+          )}
         </form>
       </div>
 
@@ -223,12 +267,21 @@ const blogManagement = () => {
                   </p>
                 </div>
 
-                <button
-                  onClick={() => handleDelete(blog.id)}
-                  className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg"
-                >
-                  Delete
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(blog)}
+                    className="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(blog.id)}
+                    className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
